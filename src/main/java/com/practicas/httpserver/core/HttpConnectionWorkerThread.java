@@ -8,16 +8,20 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.practicas.httpserver.http.HttpParser;
+
 public class HttpConnectionWorkerThread extends Thread {
 
     private Socket socket;
     private InputStream iStream;
     private OutputStream oStream;
     private final String CRLF = "\n\r";
-    private final static Logger LOGGER = LoggerFactory.getLogger(HttpConnectionWorkerThread.class);
+    private final Logger LOGGER;
+    private HttpParser httpParser;
 
     public HttpConnectionWorkerThread(Socket socket) {
         this.socket = socket;
+        this.LOGGER = LoggerFactory.getLogger(HttpConnectionWorkerThread.class);
     }
 
     @Override
@@ -25,7 +29,10 @@ public class HttpConnectionWorkerThread extends Thread {
         try {
             this.iStream = socket.getInputStream();
             this.oStream = socket.getOutputStream();
-            String html = "<html><head><title>Http Server</title></head><body><h1>Respuesta del servidor exitosa</h1></body></html>";
+            this.httpParser = new HttpParser(iStream);
+
+            String html = "<html><head><title>Http Server</title></head><body><h1>Peticion recibida: "
+                    + this.httpParser.getHttpMethod() + "</h1></body></html>";
             String response = "HTTP/1.1 200 OK" + CRLF + "Content-Length: " + html.getBytes().length + CRLF + CRLF
                     + html + CRLF + CRLF;
             this.oStream.write(response.getBytes());
@@ -39,7 +46,8 @@ public class HttpConnectionWorkerThread extends Thread {
                     this.socket.close();
                     LOGGER.info("Conexion Finalizada......");
                 }
-            } catch (IOException e) { }
+            } catch (IOException e) {
+            }
         }
     }
 }

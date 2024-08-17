@@ -1,8 +1,6 @@
 package com.practicas.httpserver.core;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -15,13 +13,14 @@ public class ServerListenerThread extends Thread {
     private String webRoot;
     private ServerSocket sSocket;
     private Socket socket;
-    private final static Logger LOGGER = LoggerFactory.getLogger(ServerListenerThread.class);
+    private final Logger LOGGER; 
     private HttpConnectionWorkerThread hConnectionWorkerThread;
 
     public ServerListenerThread(int port, String webRoot) throws IOException {
         this.port = port;
         this.webRoot = webRoot;
         this.sSocket = new ServerSocket(this.port);
+        this.LOGGER = LoggerFactory.getLogger(ServerListenerThread.class);
     }
 
     @Override
@@ -45,6 +44,14 @@ public class ServerListenerThread extends Thread {
             }
         }
 
+    }
+
+    public String getWebRoot() {
+        return webRoot;
+    }
+
+    public void setWebRoot(String webRoot) {
+        this.webRoot = webRoot;
     }
 
 }
